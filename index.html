@@ -920,3 +920,161 @@ navigate('dashboard');
 </script>
 </body>
 </html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinançasPro</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body{font-family:Arial;background:#0a0b0f;color:#fff;margin:0}
+.container{max-width:900px;margin:auto;padding:20px}
+input,button{padding:10px;margin:5px;border-radius:8px;border:none}
+button{cursor:pointer;background:#6ee7b7}
+.card{background:#111;padding:15px;border-radius:10px;margin:10px 0}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<div id="auth" class="container">
+<h2>Login / Cadastro</h2>
+<input id="email" placeholder="Email">
+<input id="pass" type="password" placeholder="Senha">
+<br>
+<button onclick="login()">Entrar</button>
+<button onclick="register()">Cadastrar</button>
+<p id="authMsg"></p>
+</div>
+
+<div id="app" class="container hidden">
+<h2>FinançasPro</h2>
+<button onclick="logout()">Sair</button>
+
+<div class="card">
+<h3>Novo Lançamento</h3>
+<input id="desc" placeholder="Descrição">
+<input id="value" type="number" placeholder="Valor">
+<select id="type">
+<option value="income">Receita</option>
+<option value="expense">Despesa</option>
+</select>
+<select id="cat">
+<option>Investimentos</option>
+<option>Salário</option>
+<option>Outros</option>
+</select>
+<button onclick="add()">Salvar</button>
+</div>
+
+<div class="card">
+<h3>Resumo</h3>
+<p id="income"></p>
+<p id="expense"></p>
+<p id="balance"></p>
+<p id="investRate"></p>
+</div>
+
+<canvas id="chart"></canvas>
+</div>
+
+<script>
+// ===== AUTH =====
+let user = null;
+
+function register(){
+  const email = emailInput().value;
+  const pass = passInput().value;
+  if(!email || !pass) return msg("Preencha tudo");
+  localStorage.setItem("user_"+email, JSON.stringify({pass,data:[]}));
+  msg("Usuário criado!");
+}
+
+function login(){
+  const email = emailInput().value;
+  const pass = passInput().value;
+  const u = JSON.parse(localStorage.getItem("user_"+email));
+  if(!u || u.pass !== pass) return msg("Login inválido");
+  user = email;
+  initApp();
+}
+
+function logout(){
+  user=null;
+  location.reload();
+}
+
+function msg(t){document.getElementById("authMsg").innerText=t}
+function emailInput(){return document.getElementById("email")}
+function passInput(){return document.getElementById("pass")}
+
+// ===== APP =====
+function getData(){
+  return JSON.parse(localStorage.getItem("user_"+user)).data;
+}
+
+function saveData(data){
+  const u = JSON.parse(localStorage.getItem("user_"+user));
+  u.data = data;
+  localStorage.setItem("user_"+user, JSON.stringify(u));
+}
+
+function add(){
+  const data = getData();
+  data.push({
+    desc:document.getElementById("desc").value,
+    value:parseFloat(document.getElementById("value").value),
+    type:document.getElementById("type").value,
+    cat:document.getElementById("cat").value
+  });
+  saveData(data);
+  render();
+}
+
+function render(){
+  const data = getData();
+  let income=0, expense=0, invest=0;
+
+  data.forEach(t=>{
+    if(t.type==="income") income+=t.value;
+    else expense+=t.value;
+    if(t.cat==="Investimentos") invest+=t.value;
+  });
+
+  document.getElementById("income").innerText="Receita: R$ "+income;
+  document.getElementById("expense").innerText="Despesa: R$ "+expense;
+  document.getElementById("balance").innerText="Saldo: R$ "+(income-expense);
+
+  const rate = income>0 ? (invest/income*100).toFixed(1) : 0;
+  document.getElementById("investRate").innerText="Taxa de investimento: "+rate+"%";
+
+  if(rate < 20){
+    document.getElementById("investRate").innerText += " ⚠️ abaixo da meta (20%)";
+  }
+
+  drawChart(income,expense);
+}
+
+let chart;
+function drawChart(i,e){
+  if(chart) chart.destroy();
+  chart = new Chart(document.getElementById("chart"),{
+    type:"pie",
+    data:{
+      labels:["Receita","Despesa"],
+      datasets:[{data:[i,e]}]
+    }
+  });
+}
+
+function initApp(){
+  document.getElementById("auth").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  render();
+}
+</script>
+
+</body>
+</html>
