@@ -28,6 +28,8 @@
     --warning-dim: rgba(251,146,60,0.1);
     --blue: #60a5fa;
     --blue-dim: rgba(96,165,250,0.1);
+    --purple: #a78bfa;
+    --purple-dim: rgba(167,139,250,0.1);
     --radius: 16px;
     --sidebar-w: 240px;
     --font-display: 'Fraunces', serif;
@@ -99,6 +101,18 @@
   .card.danger { --card-accent: var(--danger); }
   .card.blue { --card-accent: var(--blue); }
   .card.pj { --card-accent: var(--pj); }
+  .card.purple { --card-accent: var(--purple); }
+
+  /* REGRA 50-30-20 */
+  .rule-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; margin-bottom: 24px; }
+  .rule-card h3 { font-size: 0.78rem; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
+  .rule-bars { display: flex; flex-direction: column; gap: 12px; }
+  .rule-bar-row { display: flex; align-items: center; gap: 12px; }
+  .rule-bar-label { font-size: 0.8rem; color: var(--text2); width: 120px; flex-shrink: 0; }
+  .rule-bar-wrap { flex: 1; height: 8px; background: var(--surface3); border-radius: 4px; overflow: hidden; position: relative; }
+  .rule-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+  .rule-bar-target { position: absolute; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,0.3); }
+  .rule-bar-val { font-size: 0.78rem; color: var(--text3); min-width: 80px; text-align: right; }
 
   /* CHARTS */
   .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
@@ -114,7 +128,7 @@
   .btn-sm.primary { background: var(--accent-dim); border-color: rgba(110,231,183,0.25); color: var(--accent); }
   .btn-sm.primary:hover { background: rgba(110,231,183,0.2); }
   .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-  .table-filters { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; flex-wrap: wrap; }
+  .table-filters { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
   select, input[type="text"], input[type="number"], input[type="date"], input[type="month"] {
     background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 8px 12px; font-family: var(--font-body); font-size: 0.82rem; outline: none; transition: border-color 0.2s; -webkit-appearance: none;
   }
@@ -139,6 +153,9 @@
   .btn-icon.del:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-dim); }
   .empty-row td { text-align: center; color: var(--text3); padding: 48px; font-size: 0.88rem; }
 
+  /* RECORRENTE badge */
+  .recurrence-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 20px; font-size: 0.68rem; font-weight: 600; background: var(--purple-dim); color: var(--purple); border: 1px solid rgba(167,139,250,0.2); margin-left: 6px; }
+
   /* MODAL */
   .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(5px); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
   .overlay.open { opacity: 1; pointer-events: all; }
@@ -160,6 +177,24 @@
   .btn-primary.pj { background: var(--pj); }
   .btn-cancel { padding: 12px 20px; background: var(--surface2); border: 1px solid var(--border); color: var(--text2); border-radius: 10px; font-family: var(--font-body); font-size: 0.88rem; cursor: pointer; transition: all 0.2s; }
   .btn-cancel:hover { color: var(--text); border-color: var(--border2); }
+
+  /* Recurrence section in modal */
+  .recurrence-section { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+  .recurrence-section-title { font-size: 0.72rem; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .recurrence-section-title span { color: var(--purple); }
+  .recurrence-toggle { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .toggle-switch { position: relative; width: 40px; height: 22px; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider { position: absolute; cursor: pointer; inset: 0; background: var(--surface3); border-radius: 22px; transition: 0.3s; border: 1px solid var(--border); }
+  .toggle-slider:before { content: ''; position: absolute; width: 16px; height: 16px; left: 2px; top: 2px; background: var(--text3); border-radius: 50%; transition: 0.3s; }
+  input:checked + .toggle-slider { background: var(--purple-dim); border-color: rgba(167,139,250,0.4); }
+  input:checked + .toggle-slider:before { transform: translateX(18px); background: var(--purple); }
+  .recurrence-options { display: none; gap: 10px; flex-direction: column; }
+  .recurrence-options.visible { display: flex; }
+  .recurrence-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .recurrence-freq-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  .freq-btn { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--text2); font-family: var(--font-body); font-size: 0.78rem; cursor: pointer; transition: all 0.2s; }
+  .freq-btn.active { background: var(--purple-dim); border-color: rgba(167,139,250,0.3); color: var(--purple); }
 
   /* METAS */
   .goals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
@@ -203,6 +238,21 @@
   .alert-warn { background: var(--warning-dim); color: var(--warning); border: 1px solid rgba(251,146,60,0.2); }
   .alert-danger { background: var(--danger-dim); color: var(--danger); border: 1px solid rgba(248,113,113,0.2); }
 
+  /* RECORRENTES PAGE */
+  .recurrents-grid { display: flex; flex-direction: column; gap: 12px; }
+  .recurrent-item { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; display: flex; align-items: center; gap: 16px; transition: border-color 0.2s; }
+  .recurrent-item:hover { border-color: var(--border2); }
+  .recurrent-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+  .recurrent-icon.income { background: var(--accent-dim); }
+  .recurrent-icon.expense { background: var(--danger-dim); }
+  .recurrent-body { flex: 1; }
+  .recurrent-name { font-weight: 600; font-size: 0.9rem; margin-bottom: 3px; }
+  .recurrent-meta { font-size: 0.75rem; color: var(--text3); display: flex; gap: 10px; flex-wrap: wrap; }
+  .recurrent-meta span { display: flex; align-items: center; gap: 3px; }
+  .recurrent-amount { font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; text-align: right; margin-right: 12px; }
+  .recurrent-amount.income { color: var(--accent); }
+  .recurrent-amount.expense { color: var(--danger); }
+
   /* RELATÓRIO */
   .report-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
   .report-section { margin-bottom: 28px; }
@@ -217,6 +267,12 @@
   .cat-row-bar { flex: 1; height: 8px; background: var(--surface3); border-radius: 4px; overflow: hidden; }
   .cat-row-fill { height: 100%; border-radius: 4px; background: var(--accent); }
   .cat-row-val { font-size: 0.8rem; color: var(--text2); min-width: 90px; text-align: right; }
+
+  /* DICAS */
+  .tips-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-top: 20px; }
+  .tip-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+  .tip-title { font-weight: 600; font-size: 0.88rem; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .tip-body { font-size: 0.8rem; color: var(--text2); line-height: 1.6; }
 
   /* TOAST */
   .toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; padding: 13px 18px; font-size: 0.85rem; display: flex; align-items: center; gap: 10px; z-index: 300; transform: translateY(20px); opacity: 0; transition: all 0.25s; max-width: 300px; }
@@ -237,6 +293,7 @@
     .content { padding: 18px; }
     .charts-row { grid-template-columns: 1fr; }
     .cards-row { grid-template-columns: 1fr 1fr; }
+    .recurrence-row { grid-template-columns: 1fr; }
   }
   @media (max-width: 480px) {
     .cards-row { grid-template-columns: 1fr; }
@@ -261,6 +318,7 @@
       <div class="nav-group-label">Principal</div>
       <div class="nav-item active" id="nav-dashboard" onclick="navigate('dashboard')"><span class="nav-icon">📊</span> Dashboard</div>
       <div class="nav-item" id="nav-lancamentos" onclick="navigate('lancamentos')"><span class="nav-icon">💸</span> Lançamentos</div>
+      <div class="nav-item" id="nav-recorrentes" onclick="navigate('recorrentes')"><span class="nav-icon">🔁</span> Recorrentes</div>
       <div class="nav-item" id="nav-metas" onclick="navigate('metas')"><span class="nav-icon">🎯</span> Metas</div>
     </div>
     <div class="nav-group">
@@ -268,6 +326,7 @@
       <div class="nav-item" id="nav-categorias" onclick="navigate('categorias')"><span class="nav-icon">🏷️</span> Categorias</div>
       <div class="nav-item" id="nav-alertas" onclick="navigate('alertas')"><span class="nav-icon">🔔</span> Alertas</div>
       <div class="nav-item" id="nav-relatorio" onclick="navigate('relatorio')"><span class="nav-icon">📋</span> Relatório</div>
+      <div class="nav-item" id="nav-dicas" onclick="navigate('dicas')"><span class="nav-icon">💡</span> Dicas</div>
     </div>
   </nav>
   <div class="sidebar-footer">
@@ -296,6 +355,7 @@
     <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
       <div class="cards-row" id="dashCards"></div>
+      <div id="ruleSection"></div>
       <div class="charts-row">
         <div class="chart-card">
           <h3>Gastos por Categoria</h3>
@@ -307,6 +367,7 @@
         </div>
       </div>
       <div id="alertsPreview"></div>
+      <div id="recurrentPreview"></div>
     </div>
 
     <!-- LANÇAMENTOS -->
@@ -325,12 +386,28 @@
           <select class="select-sm" id="filterCat" onchange="renderLancamentos()">
             <option value="">Todas as categorias</option>
           </select>
+          <select class="select-sm" id="filterRecurr" onchange="renderLancamentos()">
+            <option value="">Todos</option>
+            <option value="yes">Recorrentes</option>
+            <option value="no">Não recorrentes</option>
+          </select>
         </div>
         <table>
           <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Tipo</th><th>Valor</th><th></th></tr></thead>
           <tbody id="lancamentosBody"></tbody>
         </table>
       </div>
+    </div>
+
+    <!-- RECORRENTES -->
+    <div class="page" id="page-recorrentes">
+      <div class="section-header">
+        <h2>🔁 Lançamentos Recorrentes</h2>
+        <div class="actions"><button class="btn-sm primary" onclick="openAddModal()">+ Adicionar</button></div>
+      </div>
+      <p style="color:var(--text3);font-size:0.82rem;margin-bottom:18px">Gerencie suas receitas e despesas fixas. Ao iniciar um novo mês, você pode lançar todas de uma vez.</p>
+      <div id="recurrentsSummary" style="margin-bottom:20px"></div>
+      <div class="recurrents-grid" id="recurrentsGrid"></div>
     </div>
 
     <!-- METAS -->
@@ -373,6 +450,13 @@
       <div id="reportContent"></div>
     </div>
 
+    <!-- DICAS -->
+    <div class="page" id="page-dicas">
+      <div class="section-header"><h2>💡 Dicas Financeiras</h2></div>
+      <p style="color:var(--text2);font-size:0.88rem;margin-bottom:4px">Baseadas em Nathalia Arcuri, Primo Rico e Investidor Sardinha.</p>
+      <div class="tips-grid" id="tipsGrid"></div>
+    </div>
+
   </div>
 </main>
 
@@ -392,6 +476,43 @@
     <div class="form-row"><label>Data</label><input type="date" id="transDate"></div>
     <div class="form-row"><label>Categoria</label><select id="transCat"></select></div>
     <div class="form-row"><label>Observação (opcional)</label><textarea id="transNote" placeholder="Notas..."></textarea></div>
+
+    <!-- RECORRÊNCIA -->
+    <div class="recurrence-section">
+      <div class="recurrence-section-title">🔁 <span>Recorrência</span></div>
+      <div class="recurrence-toggle">
+        <span style="font-size:0.85rem;color:var(--text2)">Este lançamento é recorrente?</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="isRecurring" onchange="toggleRecurrence()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="recurrence-options" id="recurrenceOptions">
+        <div>
+          <div style="font-size:0.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;font-weight:600">Frequência</div>
+          <div class="recurrence-freq-btns">
+            <button class="freq-btn active" data-freq="monthly" onclick="setFreq('monthly',this)">Mensal</button>
+            <button class="freq-btn" data-freq="weekly" onclick="setFreq('weekly',this)">Semanal</button>
+            <button class="freq-btn" data-freq="biweekly" onclick="setFreq('biweekly',this)">Quinzenal</button>
+            <button class="freq-btn" data-freq="yearly" onclick="setFreq('yearly',this)">Anual</button>
+          </div>
+        </div>
+        <div class="recurrence-row">
+          <div class="form-row" style="margin:0">
+            <label>Dia do vencimento</label>
+            <input type="number" id="recurDay" min="1" max="31" placeholder="Ex: 5">
+          </div>
+          <div class="form-row" style="margin:0">
+            <label>Término (opcional)</label>
+            <input type="date" id="recurEnd">
+          </div>
+        </div>
+        <div style="font-size:0.75rem;color:var(--purple);background:var(--purple-dim);border-radius:8px;padding:8px 10px;">
+          🔁 Este lançamento aparecerá automaticamente como sugestão todo mês na tela Recorrentes.
+        </div>
+      </div>
+    </div>
+
     <div class="form-actions">
       <button class="btn-cancel" onclick="closeModal('modalLancamento')">Cancelar</button>
       <button class="btn-primary" id="btnSaveTrans" onclick="saveTransaction()">Salvar</button>
@@ -454,6 +575,19 @@
   </div>
 </div>
 
+<!-- MODAL LANÇAR RECORRENTES -->
+<div class="overlay" id="modalBatchRecurr">
+  <div class="modal">
+    <h2>🔁 Lançar Recorrentes do Mês</h2>
+    <p style="color:var(--text2);font-size:0.85rem;margin-bottom:18px">Selecione quais lançamentos recorrentes deseja registrar para <strong id="batchMonthLabel"></strong>:</p>
+    <div id="batchList" style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px"></div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeModal('modalBatchRecurr')">Cancelar</button>
+      <button class="btn-primary" onclick="confirmBatchRecurr()">Lançar Selecionados</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"><span id="toastIcon">✓</span><span id="toastMsg">Salvo!</span></div>
 
 <script>
@@ -464,6 +598,7 @@ let currentDate = new Date();
 let editingTransId = null, editingGoalId = null;
 let chartPie = null, chartBar = null;
 let currentTransType = 'expense';
+let currentFreq = 'monthly';
 
 const K = k => `fp_${mode}_${k}`;
 const load = (k, def) => { try { const v = localStorage.getItem(K(k)); return v ? JSON.parse(v) : def; } catch { return def; } };
@@ -486,8 +621,20 @@ const DEF_PJ = [
 
 const getCats = () => load('cats', mode === 'pf' ? DEF_PF : DEF_PJ);
 const saveCats = c => save('cats', c);
-const getTxs = () => load('transactions', []).filter(t => t.mode === mode);
-const saveTxs = t => save('transactions', t);
+
+// Transactions stored globally across modes, filtered by mode field
+const getAllTxs = () => { try { const v = localStorage.getItem('fp_all_transactions'); return v ? JSON.parse(v) : []; } catch { return []; } };
+const saveAllTxs = t => localStorage.setItem('fp_all_transactions', JSON.stringify(t));
+const getTxs = () => getAllTxs().filter(t => t.mode === mode);
+const saveTxs = newModeTxs => {
+  const others = getAllTxs().filter(t => t.mode !== mode);
+  saveAllTxs([...others, ...newModeTxs]);
+};
+
+// Recurrents: template transactions
+const getRecurrents = () => load('recurrents', []);
+const saveRecurrents = r => save('recurrents', r);
+
 const getGoals = () => load('goals', []);
 const saveGoals = g => save('goals', g);
 const getAlerts = () => load('alerts', []);
@@ -495,7 +642,7 @@ const saveAlerts = a => save('alerts', a);
 
 const getMonthTxs = () => {
   const y = currentDate.getFullYear(), m = currentDate.getMonth();
-  return getTxs().filter(t => { const d = new Date(t.date); return d.getFullYear()===y && d.getMonth()===m; });
+  return getTxs().filter(t => { const d = new Date(t.date+'T12:00'); return d.getFullYear()===y && d.getMonth()===m; });
 };
 
 const uid = () => '_'+Math.random().toString(36).substr(2,9);
@@ -503,19 +650,21 @@ const fmt = v => 'R$\u00a0'+v.toLocaleString('pt-BR',{minimumFractionDigits:2,ma
 const fmtDate = d => new Date(d+'T12:00').toLocaleDateString('pt-BR');
 const fmtK = v => v>=1000?(v/1000).toFixed(0)+'k':v.toFixed(0);
 
+const FREQ_LABEL = { monthly:'Mensal', weekly:'Semanal', biweekly:'Quinzenal', yearly:'Anual' };
+const FREQ_ICON = { monthly:'📅', weekly:'🗓️', biweekly:'📆', yearly:'🗃️' };
+
 // ===== NAV =====
 function navigate(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active','pj-mode'));
   document.getElementById('page-'+page).classList.add('active');
   const ni = document.getElementById('nav-'+page);
-  ni.classList.add('active');
-  if (mode==='pj') ni.classList.add('pj-mode');
+  if (ni) { ni.classList.add('active'); if (mode==='pj') ni.classList.add('pj-mode'); }
   currentPage = page;
-  const titles = {dashboard:'Dashboard',lancamentos:'Lançamentos',metas:'Metas & Objetivos',categorias:'Categorias',alertas:'Alertas',relatorio:'Relatório'};
-  document.getElementById('topbarTitle').textContent = titles[page];
-  document.getElementById('topbarMode').textContent = (mode==='pf'?'Pessoa Física':'PJ / MEI') + ' • ' + titles[page];
-  const renders = {dashboard:renderDashboard,lancamentos:renderLancamentos,metas:renderMetas,categorias:renderCategorias,alertas:renderAlertas,relatorio:renderRelatorio};
+  const titles = {dashboard:'Dashboard',lancamentos:'Lançamentos',recorrentes:'Recorrentes',metas:'Metas & Objetivos',categorias:'Categorias',alertas:'Alertas',relatorio:'Relatório',dicas:'Dicas'};
+  document.getElementById('topbarTitle').textContent = titles[page]||page;
+  document.getElementById('topbarMode').textContent = (mode==='pf'?'Pessoa Física':'PJ / MEI') + ' • ' + (titles[page]||page);
+  const renders = {dashboard:renderDashboard,lancamentos:renderLancamentos,recorrentes:renderRecorrentes,metas:renderMetas,categorias:renderCategorias,alertas:renderAlertas,relatorio:renderRelatorio,dicas:renderDicas};
   renders[page]?.();
   if (window.innerWidth<=768) closeSidebar();
 }
@@ -537,6 +686,18 @@ function updateMonthLabel() {
   document.getElementById('monthLabel').textContent = currentDate.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
 }
 
+// ===== RECORRÊNCIA =====
+function toggleRecurrence() {
+  const checked = document.getElementById('isRecurring').checked;
+  const opts = document.getElementById('recurrenceOptions');
+  opts.classList.toggle('visible', checked);
+}
+function setFreq(freq, btn) {
+  currentFreq = freq;
+  document.querySelectorAll('.freq-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
 // ===== DASHBOARD =====
 const COLORS = ['#6ee7b7','#60a5fa','#fbbf24','#f87171','#a78bfa','#fb923c','#34d399','#e879f9','#38bdf8','#4ade80','#facc15','#f472b6'];
 
@@ -545,13 +706,47 @@ function renderDashboard() {
   const income = txs.filter(t=>t.type==='income').reduce((s,t)=>s+t.value,0);
   const expense = txs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.value,0);
   const balance = income-expense;
+  const recurrents = getRecurrents();
 
+  // Cards
   document.getElementById('dashCards').innerHTML = `
     <div class="card"><div class="card-icon">💰</div><div class="card-label">Receitas</div><div class="card-value positive">${fmt(income)}</div><div class="card-sub">Este mês</div></div>
     <div class="card danger"><div class="card-icon">💸</div><div class="card-label">Despesas</div><div class="card-value negative">${fmt(expense)}</div><div class="card-sub">Este mês</div></div>
     <div class="card ${balance<0?'danger':''}"><div class="card-icon">${balance>=0?'✅':'⚠️'}</div><div class="card-label">Saldo</div><div class="card-value ${balance>=0?'positive':'negative'}">${fmt(balance)}</div><div class="card-sub">Resultado</div></div>
     <div class="card blue"><div class="card-icon">📑</div><div class="card-label">Lançamentos</div><div class="card-value">${txs.length}</div><div class="card-sub">No mês</div></div>
   `;
+
+  // Regra 50-30-20 (only PF)
+  if (mode === 'pf' && income > 0) {
+    const necessidades = txs.filter(t=>t.type==='expense'&&['c1','c2','c3','c4'].includes(t.cat)).reduce((s,t)=>s+t.value,0);
+    const desejos = txs.filter(t=>t.type==='expense'&&['c5','c7'].includes(t.cat)).reduce((s,t)=>s+t.value,0);
+    const invest = txs.filter(t=>t.type==='expense'&&['c8'].includes(t.cat)).reduce((s,t)=>s+t.value,0);
+    const pN = (necessidades/income*100), pD = (desejos/income*100), pI = (invest/income*100);
+    const clr = (v,target) => v>target+5?'var(--danger)':v>=target-5?'var(--accent)':'var(--warning)';
+    document.getElementById('ruleSection').innerHTML = `
+      <div class="rule-card" style="margin-bottom:24px">
+        <h3>📐 Regra 50-30-20 do Mês</h3>
+        <div class="rule-bars">
+          <div class="rule-bar-row">
+            <div class="rule-bar-label">🏠 Necessidades</div>
+            <div class="rule-bar-wrap"><div class="rule-bar-fill" style="width:${Math.min(pN,100).toFixed(1)}%;background:${clr(pN,50)}"></div><div class="rule-bar-target" style="left:50%"></div></div>
+            <div class="rule-bar-val" style="color:${clr(pN,50)}">${pN.toFixed(1)}% <span style="color:var(--text3)">/50%</span></div>
+          </div>
+          <div class="rule-bar-row">
+            <div class="rule-bar-label">🎬 Desejos</div>
+            <div class="rule-bar-wrap"><div class="rule-bar-fill" style="width:${Math.min(pD,100).toFixed(1)}%;background:${clr(pD,30)}"></div><div class="rule-bar-target" style="left:30%"></div></div>
+            <div class="rule-bar-val" style="color:${clr(pD,30)}">${pD.toFixed(1)}% <span style="color:var(--text3)">/30%</span></div>
+          </div>
+          <div class="rule-bar-row">
+            <div class="rule-bar-label">📈 Investimentos</div>
+            <div class="rule-bar-wrap"><div class="rule-bar-fill" style="width:${Math.min(pI,100).toFixed(1)}%;background:${pI>=20?'var(--accent)':'var(--danger)'}"></div><div class="rule-bar-target" style="left:20%"></div></div>
+            <div class="rule-bar-val" style="color:${pI>=20?'var(--accent)':'var(--danger)'}">${pI.toFixed(1)}% <span style="color:var(--text3)">/20%</span></div>
+          </div>
+        </div>
+      </div>`;
+  } else {
+    document.getElementById('ruleSection').innerHTML = '';
+  }
 
   // Pie
   const expByCat = {};
@@ -570,7 +765,7 @@ function renderDashboard() {
   const months=[], incA=[], expA=[];
   for(let i=5;i>=0;i--){
     const d=new Date(currentDate.getFullYear(),currentDate.getMonth()-i,1);
-    const all=getTxs().filter(t=>{const dt=new Date(t.date);return dt.getFullYear()===d.getFullYear()&&dt.getMonth()===d.getMonth();});
+    const all=getTxs().filter(t=>{const dt=new Date(t.date+'T12:00');return dt.getFullYear()===d.getFullYear()&&dt.getMonth()===d.getMonth();});
     months.push(d.toLocaleDateString('pt-BR',{month:'short'}));
     incA.push(all.filter(t=>t.type==='income').reduce((s,t)=>s+t.value,0));
     expA.push(all.filter(t=>t.type==='expense').reduce((s,t)=>s+t.value,0));
@@ -590,22 +785,36 @@ function renderDashboard() {
 
   // Alerts preview
   const alerts = getAlerts();
-  if (!alerts.length) { document.getElementById('alertsPreview').innerHTML=''; return; }
-  let html = `<div class="section-header" style="margin-top:8px"><h2>Alertas do Mês</h2></div><div class="alerts-list">`;
-  alerts.forEach(a=>{
-    const cat=cats.find(c=>c.id===a.catId); if(!cat) return;
-    const spent=txs.filter(t=>t.type==='expense'&&t.cat===a.catId).reduce((s,t)=>s+t.value,0);
-    const pct=a.limit>0?Math.min((spent/a.limit)*100,100):0;
-    const over=spent>a.limit, warn=pct>=80;
-    const cls=over?'alert-danger':warn?'alert-warn':'alert-ok';
-    const fillCls=over?'over':warn?'warn':'';
-    html+=`<div class="alert-item"><div class="alert-icon">${cat.emoji}</div>
-      <div class="alert-body"><div class="alert-title">${cat.name}</div>
-      <div class="alert-desc">${fmt(spent)} de ${fmt(a.limit)} — ${pct.toFixed(0)}% usado</div>
-      <div class="alert-limit-bar"><div class="progress-bar"><div class="progress-fill ${fillCls}" style="width:${pct}%"></div></div></div></div>
-      <span class="alert-badge ${cls}">${over?'⚠ Excedido':warn?'🟡 Atenção':'✅ OK'}</span></div>`;
-  });
-  document.getElementById('alertsPreview').innerHTML = html+'</div>';
+  let alertHtml = '';
+  if (alerts.length) {
+    alertHtml = `<div class="section-header" style="margin-top:8px"><h2>Alertas do Mês</h2></div><div class="alerts-list">`;
+    alerts.forEach(a=>{
+      const cat=cats.find(c=>c.id===a.catId); if(!cat) return;
+      const spent=txs.filter(t=>t.type==='expense'&&t.cat===a.catId).reduce((s,t)=>s+t.value,0);
+      const pct=a.limit>0?Math.min((spent/a.limit)*100,100):0;
+      const over=spent>a.limit, warn=pct>=80;
+      const cls=over?'alert-danger':warn?'alert-warn':'alert-ok';
+      alertHtml+=`<div class="alert-item"><div class="alert-icon">${cat.emoji}</div>
+        <div class="alert-body"><div class="alert-title">${cat.name}</div>
+        <div class="alert-desc">${fmt(spent)} de ${fmt(a.limit)} — ${pct.toFixed(0)}% usado</div>
+        <div class="alert-limit-bar"><div class="progress-bar"><div class="progress-fill ${over?'over':warn?'warn':''}" style="width:${pct}%"></div></div></div></div>
+        <span class="alert-badge ${cls}">${over?'⚠ Excedido':warn?'🟡 Atenção':'✅ OK'}</span></div>`;
+    });
+    alertHtml += '</div>';
+  }
+  document.getElementById('alertsPreview').innerHTML = alertHtml;
+
+  // Recurrents preview
+  const pendingRecurrents = getPendingRecurrents();
+  if (pendingRecurrents.length) {
+    document.getElementById('recurrentPreview').innerHTML = `
+      <div class="section-header" style="margin-top:16px"><h2>🔁 Recorrentes Pendentes</h2>
+        <button class="btn-sm primary" onclick="openBatchRecurr()">Lançar todos</button>
+      </div>
+      <p style="color:var(--text3);font-size:0.8rem;margin-bottom:10px">${pendingRecurrents.length} lançamento(s) recorrente(s) ainda não registrado(s) este mês.</p>`;
+  } else {
+    document.getElementById('recurrentPreview').innerHTML = '';
+  }
 }
 
 // ===== LANÇAMENTOS =====
@@ -620,16 +829,20 @@ function renderLancamentos() {
   let txs = getMonthTxs();
   const tf = document.getElementById('filterType').value;
   const cf = document.getElementById('filterCat').value;
+  const rf = document.getElementById('filterRecurr').value;
   if (tf) txs = txs.filter(t=>t.type===tf);
   if (cf) txs = txs.filter(t=>t.cat===cf);
+  if (rf==='yes') txs = txs.filter(t=>t.recurringId);
+  if (rf==='no') txs = txs.filter(t=>!t.recurringId);
   txs.sort((a,b)=>new Date(b.date)-new Date(a.date));
 
   const body = document.getElementById('lancamentosBody');
   if (!txs.length) { body.innerHTML='<tr class="empty-row"><td colspan="6">Nenhum lançamento neste mês</td></tr>'; return; }
   body.innerHTML = txs.map(t=>{
     const cat=cats.find(c=>c.id===t.cat);
+    const recTag = t.recurringId ? `<span class="recurrence-badge">🔁 Recorrente</span>` : '';
     return `<tr><td>${fmtDate(t.date)}</td>
-      <td>${t.desc}${t.note?`<br><small style="color:var(--text3)">${t.note}</small>`:''}</td>
+      <td>${t.desc}${recTag}${t.note?`<br><small style="color:var(--text3)">${t.note}</small>`:''}</td>
       <td>${cat?`${cat.emoji} ${cat.name}`:'—'}</td>
       <td class="type-${t.type}"><span class="badge"><span class="badge-dot"></span>${t.type==='income'?'Receita':'Despesa'}</span></td>
       <td class="${t.type==='income'?'amount-income':'amount-expense'}">${t.type==='income'?'+':'-'}${fmt(t.value)}</td>
@@ -657,7 +870,125 @@ function editTx(id) {
   document.getElementById('transNote').value = t.note||'';
   populateCatSel();
   document.getElementById('transCat').value = t.cat;
+  // Recurrence
+  document.getElementById('isRecurring').checked = false;
+  document.getElementById('recurrenceOptions').classList.remove('visible');
   openModal('modalLancamento');
+}
+
+// ===== RECORRENTES =====
+function getPendingRecurrents() {
+  const recs = getRecurrents();
+  const y = currentDate.getFullYear(), m = currentDate.getMonth();
+  const txs = getMonthTxs();
+  return recs.filter(r => {
+    // Check if already launched this month
+    const already = txs.some(t => t.recurringId === r.id);
+    if (already) return false;
+    // Check end date
+    if (r.endDate) {
+      const end = new Date(r.endDate+'T12:00');
+      if (new Date(y, m, 1) > end) return false;
+    }
+    return true;
+  });
+}
+
+function renderRecorrentes() {
+  const recs = getRecurrents();
+  const cats = getCats();
+  const pending = getPendingRecurrents();
+  const txs = getMonthTxs();
+
+  // Summary
+  const totalRec = recs.filter(r=>r.type==='income').reduce((s,r)=>s+r.value,0);
+  const totalExp = recs.filter(r=>r.type==='expense').reduce((s,r)=>s+r.value,0);
+  document.getElementById('recurrentsSummary').innerHTML = `
+    <div class="cards-row" style="margin-bottom:16px">
+      <div class="card"><div class="card-icon">💰</div><div class="card-label">Receitas fixas/mês</div><div class="card-value positive">${fmt(totalRec)}</div></div>
+      <div class="card danger"><div class="card-icon">💸</div><div class="card-label">Despesas fixas/mês</div><div class="card-value negative">${fmt(totalExp)}</div></div>
+      <div class="card purple"><div class="card-icon">🔁</div><div class="card-label">Templates ativos</div><div class="card-value">${recs.length}</div></div>
+      ${pending.length ? `<div class="card" style="--card-accent:var(--warning)"><div class="card-icon">⏳</div><div class="card-label">Pendentes este mês</div><div class="card-value" style="color:var(--warning)">${pending.length}</div><div class="card-sub"><button class="btn-sm primary" style="margin-top:4px" onclick="openBatchRecurr()">Lançar agora</button></div></div>` : ''}
+    </div>`;
+
+  const grid = document.getElementById('recurrentsGrid');
+  if (!recs.length) {
+    grid.innerHTML = '<div style="color:var(--text3);font-size:0.9rem;padding:40px 0">Nenhum lançamento recorrente cadastrado. Ao adicionar um lançamento, marque-o como recorrente! 🔁</div>';
+    return;
+  }
+  grid.innerHTML = recs.map(r => {
+    const cat = cats.find(c=>c.id===r.cat);
+    const alreadyLaunched = txs.some(t=>t.recurringId===r.id);
+    return `<div class="recurrent-item">
+      <div class="recurrent-icon ${r.type}">${cat?.emoji||'📦'}</div>
+      <div class="recurrent-body">
+        <div class="recurrent-name">${r.desc}</div>
+        <div class="recurrent-meta">
+          <span>${FREQ_ICON[r.freq]} ${FREQ_LABEL[r.freq]}</span>
+          ${r.day?`<span>📅 Dia ${r.day}</span>`:''}
+          ${cat?`<span>🏷️ ${cat.name}</span>`:''}
+          ${alreadyLaunched?`<span style="color:var(--accent)">✅ Lançado este mês</span>`:`<span style="color:var(--warning)">⏳ Pendente</span>`}
+        </div>
+      </div>
+      <div class="recurrent-amount ${r.type}">${r.type==='income'?'+':'-'}${fmt(r.value)}</div>
+      <div style="display:flex;gap:6px">
+        ${!alreadyLaunched?`<button class="btn-icon" onclick="launchOne('${r.id}')" title="Lançar agora">▶</button>`:''}
+        <button class="btn-icon del" onclick="deleteRecurrent('${r.id}')" title="Excluir">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function launchOne(rid) {
+  const r = getRecurrents().find(x=>x.id===rid);
+  if (!r) return;
+  const txs = getTxs();
+  const date = `${currentDate.getFullYear()}-${String(currentDate.getMonth()+1).padStart(2,'0')}-${String(r.day||1).padStart(2,'0')}`;
+  txs.push({id:uid(),desc:r.desc,value:r.value,date,cat:r.cat,note:`Recorrente (${FREQ_LABEL[r.freq]})`,type:r.type,mode,recurringId:r.id,createdAt:Date.now()});
+  saveTxs(txs);
+  renderRecorrentes();
+  toast('Lançado! ✅','success');
+}
+
+function deleteRecurrent(id) {
+  if (!confirm('Excluir template recorrente? Os lançamentos já feitos não serão afetados.')) return;
+  saveRecurrents(getRecurrents().filter(r=>r.id!==id));
+  renderRecorrentes();
+  toast('Template removido','success');
+}
+
+function openBatchRecurr() {
+  const pending = getPendingRecurrents();
+  const cats = getCats();
+  const y = currentDate.getFullYear(), m = currentDate.getMonth();
+  document.getElementById('batchMonthLabel').textContent = currentDate.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  document.getElementById('batchList').innerHTML = pending.map(r=>{
+    const cat=cats.find(c=>c.id===r.cat);
+    return `<label style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer">
+      <input type="checkbox" checked value="${r.id}" style="width:16px;height:16px;accent-color:var(--accent)">
+      <span style="font-size:1.1rem">${cat?.emoji||'📦'}</span>
+      <span style="flex:1"><strong style="font-size:0.88rem">${r.desc}</strong><br><small style="color:var(--text3)">${FREQ_LABEL[r.freq]} • ${cat?.name||'—'}</small></span>
+      <span style="font-weight:600;color:${r.type==='income'?'var(--accent)':'var(--danger)'}">${r.type==='income'?'+':'-'}${fmt(r.value)}</span>
+    </label>`;
+  }).join('');
+  openModal('modalBatchRecurr');
+}
+
+function confirmBatchRecurr() {
+  const checked = [...document.querySelectorAll('#batchList input[type=checkbox]:checked')].map(el=>el.value);
+  if (!checked.length) { toast('Nenhum selecionado','error'); return; }
+  const recs = getRecurrents();
+  const txs = getTxs();
+  checked.forEach(rid=>{
+    const r=recs.find(x=>x.id===rid); if(!r) return;
+    const date=`${currentDate.getFullYear()}-${String(currentDate.getMonth()+1).padStart(2,'0')}-${String(r.day||1).padStart(2,'0')}`;
+    txs.push({id:uid(),desc:r.desc,value:r.value,date,cat:r.cat,note:`Recorrente (${FREQ_LABEL[r.freq]})`,type:r.type,mode,recurringId:r.id,createdAt:Date.now()});
+  });
+  saveTxs(txs);
+  closeModal('modalBatchRecurr');
+  toast(`${checked.length} lançamento(s) registrado(s)! 🔁`,'success');
+  if (currentPage==='dashboard') renderDashboard();
+  if (currentPage==='recorrentes') renderRecorrentes();
 }
 
 // ===== METAS =====
@@ -667,7 +998,7 @@ function renderMetas() {
   if (!goals.length) { grid.innerHTML='<div style="color:var(--text3);font-size:0.9rem;padding:40px 0">Nenhuma meta ainda. Crie sua primeira meta! 🎯</div>'; return; }
   grid.innerHTML = goals.map(g=>{
     const pct = g.target>0?Math.min((g.current/g.target)*100,100):0;
-    const dL = g.deadline?Math.ceil((new Date(g.deadline)-new Date())/(864e5)):null;
+    const dL = g.deadline?Math.ceil((new Date(g.deadline+'T12:00')-new Date())/(864e5)):null;
     return `<div class="goal-card" onclick="openUpdateGoal('${g.id}')">
       <div class="goal-header">
         <div><div class="goal-name">${g.name}</div>${dL!==null?`<div class="goal-deadline">📅 ${dL>0?dL+' dias restantes':'Prazo encerrado'}</div>`:''}</div>
@@ -753,8 +1084,8 @@ function renderRelatorio() {
   const all=getTxs(), cats=getCats();
   const y=currentDate.getFullYear(), m=currentDate.getMonth();
   const txs = period==='month'
-    ? all.filter(t=>{const d=new Date(t.date);return d.getFullYear()===y&&d.getMonth()===m;})
-    : all.filter(t=>new Date(t.date).getFullYear()===y);
+    ? all.filter(t=>{const d=new Date(t.date+'T12:00');return d.getFullYear()===y&&d.getMonth()===m;})
+    : all.filter(t=>new Date(t.date+'T12:00').getFullYear()===y);
   const income=txs.filter(t=>t.type==='income').reduce((s,t)=>s+t.value,0);
   const expense=txs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.value,0);
   const balance=income-expense;
@@ -762,6 +1093,8 @@ function renderRelatorio() {
   txs.filter(t=>t.type==='expense').forEach(t=>{expByCat[t.cat]=(expByCat[t.cat]||0)+t.value;});
   const sorted=Object.entries(expByCat).sort((a,b)=>b[1]-a[1]);
   const maxE=sorted[0]?.[1]||1;
+  const recExpense = txs.filter(t=>t.type==='expense'&&t.recurringId).reduce((s,t)=>s+t.value,0);
+  const investRate = income>0?((balance/income)*100):0;
   document.getElementById('reportContent').innerHTML=`
     <div class="report-section">
       <h3>Resumo ${period==='month'?'do Mês':'do Ano'}</h3>
@@ -770,8 +1103,10 @@ function renderRelatorio() {
         <div class="stat-item"><div class="stat-label">Total Despesas</div><div class="stat-val" style="color:var(--danger)">${fmt(expense)}</div></div>
         <div class="stat-item"><div class="stat-label">Saldo</div><div class="stat-val" style="color:${balance>=0?'var(--accent)':'var(--danger)'}">${fmt(balance)}</div></div>
         <div class="stat-item"><div class="stat-label">Lançamentos</div><div class="stat-val">${txs.length}</div></div>
-        <div class="stat-item"><div class="stat-label">Taxa de Poupança</div><div class="stat-val">${income>0?((balance/income)*100).toFixed(1)+'%':'—'}</div></div>
+        <div class="stat-item"><div class="stat-label">Taxa de Poupança</div><div class="stat-val" style="color:${investRate>=20?'var(--accent)':'var(--danger)'}">${income>0?investRate.toFixed(1)+'%':'—'}</div></div>
         <div class="stat-item"><div class="stat-label">Média por Dia</div><div class="stat-val" style="color:var(--danger)">${fmt(expense/(period==='month'?30:365))}</div></div>
+        <div class="stat-item"><div class="stat-label">Despesas Fixas</div><div class="stat-val" style="color:var(--purple)">${fmt(recExpense)}</div></div>
+        <div class="stat-item"><div class="stat-label">Despesas Variáveis</div><div class="stat-val">${fmt(expense-recExpense)}</div></div>
       </div>
     </div>
     <div class="report-section">
@@ -786,17 +1121,39 @@ function renderRelatorio() {
 }
 
 function exportCSV() {
-  const txs=getTxs(), cats=getCats();
-  const rows=[['Data','Descrição','Categoria','Tipo','Valor (R$)','Observação']];
+  const txs=getTxs(), cats=getCats(), recs=getRecurrents();
+  const rows=[['Data','Descrição','Categoria','Tipo','Valor (R$)','Recorrente','Observação']];
   txs.sort((a,b)=>new Date(b.date)-new Date(a.date)).forEach(t=>{
     const cat=cats.find(c=>c.id===t.cat);
-    rows.push([t.date,t.desc,cat?cat.name:'',t.type==='income'?'Receita':'Despesa',t.value.toFixed(2).replace('.',','),t.note||'']);
+    const isRec = t.recurringId?'Sim':'Não';
+    rows.push([t.date,t.desc,cat?cat.name:'',t.type==='income'?'Receita':'Despesa',t.value.toFixed(2).replace('.',','),isRec,t.note||'']);
   });
   const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
   a.download=`financas_${mode}_${currentDate.getFullYear()}.csv`;
   a.click(); toast('CSV exportado!','success');
+}
+
+// ===== DICAS =====
+function renderDicas() {
+  const tips = [
+    {icon:'📐',title:'Regra 50-30-20',body:'Divida sua renda: 50% para necessidades (moradia, alimentação, saúde), 30% para desejos (lazer, restaurante, vestuário) e 20% para investimentos e metas. Use o dashboard para monitorar em tempo real.'},
+    {icon:'🛡️',title:'Fundo de Emergência',body:'Antes de qualquer investimento, monte uma reserva equivalente a 6x seus gastos mensais. Crie uma meta aqui com esse objetivo e contribua todo mês.'},
+    {icon:'🏢',title:'Separação PF/PJ',body:'Nunca misture as finanças pessoais com as do CNPJ. Use o modo PJ exclusivamente para movimentações da empresa e registre o pró-labore como saída no PJ e entrada no PF.'},
+    {icon:'🔁',title:'Automatize as Fixas',body:'Cadastre salário, aluguel, internet e demais despesas fixas como Recorrentes. No início de cada mês, lance todos de uma vez com um clique e economize tempo.'},
+    {icon:'📊',title:'Revise seus gastos',body:'Toda semana, dedique 10 minutos para olhar seus lançamentos. Pequenas revisões semanais evitam surpresas no fechamento do mês.'},
+    {icon:'🎯',title:'Metas com prazo',body:'Metas sem prazo são apenas desejos. Defina uma data e calcule quanto precisa guardar por mês. A barra de progresso te mantém motivado.'},
+    {icon:'📉',title:'Identifique os vilões',body:'Use o gráfico de pizza do Dashboard para ver qual categoria consome mais. Muitas vezes, pequenas despesas variáveis somam mais que as fixas.'},
+    {icon:'💡',title:'Regra dos 72',body:'Divida 72 pela taxa de juros anual do investimento e saberá em quantos anos o dinheiro dobra. Ex: 72 ÷ 12% = 6 anos. Quanto antes investir, mais o tempo trabalha a seu favor.'},
+    {icon:'🧾',title:'DAS e impostos MEI',body:'Pague o DAS sempre no vencimento (dia 20). Atrasos geram multa e juros. Registre no modo PJ e configure um alerta para não esquecer.'},
+    {icon:'💾',title:'Faça backup do CSV',body:'Exporte o CSV mensalmente e guarde em nuvem (Google Drive, Dropbox). O localStorage é local — se limpar o navegador, os dados são apagados.'},
+  ];
+  document.getElementById('tipsGrid').innerHTML = tips.map(t=>`
+    <div class="tip-card">
+      <div class="tip-title"><span style="font-size:1.2rem">${t.icon}</span>${t.title}</div>
+      <div class="tip-body">${t.body}</div>
+    </div>`).join('');
 }
 
 // ===== MODALS =====
@@ -808,6 +1165,12 @@ function openAddModal() {
   document.getElementById('transValue').value='';
   document.getElementById('transDate').value=new Date().toISOString().split('T')[0];
   document.getElementById('transNote').value='';
+  document.getElementById('isRecurring').checked=false;
+  document.getElementById('recurrenceOptions').classList.remove('visible');
+  document.getElementById('recurDay').value='';
+  document.getElementById('recurEnd').value='';
+  currentFreq='monthly';
+  document.querySelectorAll('.freq-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
   populateCatSel();
   openModal('modalLancamento');
 }
@@ -827,20 +1190,37 @@ function saveTransaction() {
   const date=document.getElementById('transDate').value;
   const cat=document.getElementById('transCat').value;
   const note=document.getElementById('transNote').value.trim();
+  const isRec=document.getElementById('isRecurring').checked;
+  const recurDay=parseInt(document.getElementById('recurDay').value)||null;
+  const recurEnd=document.getElementById('recurEnd').value||null;
+
   if (!desc||!value||!date||!cat){toast('Preencha todos os campos','error');return;}
+
+  let recurringId = null;
+
+  // Save recurring template
+  if (isRec && !editingTransId) {
+    const template = {id:uid(),desc,value,cat,type:currentTransType,mode,freq:currentFreq,day:recurDay,endDate:recurEnd,createdAt:Date.now()};
+    const recs = getRecurrents();
+    recs.push(template);
+    saveRecurrents(recs);
+    recurringId = template.id;
+  }
+
   const txs=getTxs();
   if (editingTransId) {
     const idx=txs.findIndex(t=>t.id===editingTransId);
     if (idx>=0) txs[idx]={...txs[idx],desc,value,date,cat,note,type:currentTransType};
   } else {
-    txs.push({id:uid(),desc,value,date,cat,note,type:currentTransType,mode,createdAt:Date.now()});
+    txs.push({id:uid(),desc,value,date,cat,note,type:currentTransType,mode,recurringId,createdAt:Date.now()});
   }
   saveTxs(txs);
   closeModal('modalLancamento');
-  toast(editingTransId?'Lançamento atualizado':'Lançamento adicionado','success');
+  toast(editingTransId?'Lançamento atualizado':`Lançamento adicionado${isRec?' + recorrência criada 🔁':''}`,'success');
   editingTransId=null;
   if (currentPage==='dashboard') renderDashboard();
   if (currentPage==='lancamentos') renderLancamentos();
+  if (currentPage==='recorrentes') renderRecorrentes();
 }
 
 function openGoalModal() {
@@ -910,171 +1290,13 @@ function toast(msg,type='success'){
   document.getElementById('toastMsg').textContent=msg;
   document.getElementById('toastIcon').textContent=type==='success'?'✓':'✕';
   t.className='toast show '+type;
-  setTimeout(()=>t.classList.remove('show'),2800);
+  setTimeout(()=>t.classList.remove('show'),3000);
 }
 
 // INIT
 updateMonthLabel();
-if (!localStorage.getItem('fp_pf_cats')) saveCats(DEF_PF);
+if (!localStorage.getItem('fp_pf_cats')) save('cats', DEF_PF);
 navigate('dashboard');
 </script>
-</body>
-</html>
-
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FinançasPro</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-body{font-family:Arial;background:#0a0b0f;color:#fff;margin:0}
-.container{max-width:900px;margin:auto;padding:20px}
-input,button{padding:10px;margin:5px;border-radius:8px;border:none}
-button{cursor:pointer;background:#6ee7b7}
-.card{background:#111;padding:15px;border-radius:10px;margin:10px 0}
-.hidden{display:none}
-</style>
-</head>
-<body>
-
-<div id="auth" class="container">
-<h2>Login / Cadastro</h2>
-<input id="email" placeholder="Email">
-<input id="pass" type="password" placeholder="Senha">
-<br>
-<button onclick="login()">Entrar</button>
-<button onclick="register()">Cadastrar</button>
-<p id="authMsg"></p>
-</div>
-
-<div id="app" class="container hidden">
-<h2>FinançasPro</h2>
-<button onclick="logout()">Sair</button>
-
-<div class="card">
-<h3>Novo Lançamento</h3>
-<input id="desc" placeholder="Descrição">
-<input id="value" type="number" placeholder="Valor">
-<select id="type">
-<option value="income">Receita</option>
-<option value="expense">Despesa</option>
-</select>
-<select id="cat">
-<option>Investimentos</option>
-<option>Salário</option>
-<option>Outros</option>
-</select>
-<button onclick="add()">Salvar</button>
-</div>
-
-<div class="card">
-<h3>Resumo</h3>
-<p id="income"></p>
-<p id="expense"></p>
-<p id="balance"></p>
-<p id="investRate"></p>
-</div>
-
-<canvas id="chart"></canvas>
-</div>
-
-<script>
-// ===== AUTH =====
-let user = null;
-
-function register(){
-  const email = emailInput().value;
-  const pass = passInput().value;
-  if(!email || !pass) return msg("Preencha tudo");
-  localStorage.setItem("user_"+email, JSON.stringify({pass,data:[]}));
-  msg("Usuário criado!");
-}
-
-function login(){
-  const email = emailInput().value;
-  const pass = passInput().value;
-  const u = JSON.parse(localStorage.getItem("user_"+email));
-  if(!u || u.pass !== pass) return msg("Login inválido");
-  user = email;
-  initApp();
-}
-
-function logout(){
-  user=null;
-  location.reload();
-}
-
-function msg(t){document.getElementById("authMsg").innerText=t}
-function emailInput(){return document.getElementById("email")}
-function passInput(){return document.getElementById("pass")}
-
-// ===== APP =====
-function getData(){
-  return JSON.parse(localStorage.getItem("user_"+user)).data;
-}
-
-function saveData(data){
-  const u = JSON.parse(localStorage.getItem("user_"+user));
-  u.data = data;
-  localStorage.setItem("user_"+user, JSON.stringify(u));
-}
-
-function add(){
-  const data = getData();
-  data.push({
-    desc:document.getElementById("desc").value,
-    value:parseFloat(document.getElementById("value").value),
-    type:document.getElementById("type").value,
-    cat:document.getElementById("cat").value
-  });
-  saveData(data);
-  render();
-}
-
-function render(){
-  const data = getData();
-  let income=0, expense=0, invest=0;
-
-  data.forEach(t=>{
-    if(t.type==="income") income+=t.value;
-    else expense+=t.value;
-    if(t.cat==="Investimentos") invest+=t.value;
-  });
-
-  document.getElementById("income").innerText="Receita: R$ "+income;
-  document.getElementById("expense").innerText="Despesa: R$ "+expense;
-  document.getElementById("balance").innerText="Saldo: R$ "+(income-expense);
-
-  const rate = income>0 ? (invest/income*100).toFixed(1) : 0;
-  document.getElementById("investRate").innerText="Taxa de investimento: "+rate+"%";
-
-  if(rate < 20){
-    document.getElementById("investRate").innerText += " ⚠️ abaixo da meta (20%)";
-  }
-
-  drawChart(income,expense);
-}
-
-let chart;
-function drawChart(i,e){
-  if(chart) chart.destroy();
-  chart = new Chart(document.getElementById("chart"),{
-    type:"pie",
-    data:{
-      labels:["Receita","Despesa"],
-      datasets:[{data:[i,e]}]
-    }
-  });
-}
-
-function initApp(){
-  document.getElementById("auth").classList.add("hidden");
-  document.getElementById("app").classList.remove("hidden");
-  render();
-}
-</script>
-
 </body>
 </html>
