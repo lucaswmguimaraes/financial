@@ -486,7 +486,7 @@ const DEF_PJ = [
 
 const getCats = () => load('cats', mode === 'pf' ? DEF_PF : DEF_PJ);
 const saveCats = c => save('cats', c);
-const getTxs = () => load('transactions', []);
+const getTxs = () => load('transactions', []).filter(t => t.mode === mode);
 const saveTxs = t => save('transactions', t);
 const getGoals = () => load('goals', []);
 const saveGoals = g => save('goals', g);
