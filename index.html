@@ -508,6 +508,12 @@ input:checked+.sw-sl:before{transform:translateX(17px);background:var(--purple)}
   </nav>
   <div class="sidebar-footer">
     <button class="btn-new" id="btnNew" onclick="openAddModal()">+ Novo Lançamento</button>
+    <div style="display:flex;gap:6px;margin-top:8px">
+      <button class="btn-sm" style="flex:1" onclick="exportBackup()">💾 Backup</button>
+      <button class="btn-sm" style="flex:1" onclick="document.getElementById('restoreFile').click()">♻️ Restaurar</button>
+    </div>
+    <input type="file" id="restoreFile" accept=".json,application/json" style="display:none" onchange="importBackup(this)">
+    <div id="backupInfo" style="font-size:0.7rem;color:var(--text3);margin-top:6px;text-align:center"></div>
   </div>
 </aside>
 
@@ -895,7 +901,7 @@ function loginAs(u){
   document.getElementById('sidebarAvatar').textContent=u.avatar;
   document.getElementById('sidebarAvatar').style.background=AVATAR_COLORS[getUsers().findIndex(x=>x.id===u.id)%AVATAR_COLORS.length];
   document.getElementById('sidebarName').textContent=u.name;
-  initApp();
+  initApp();safetyInit();
 }
 function doLogout(){
   currentUser=null;
@@ -937,6 +943,85 @@ const getMonthTxs=(y,m)=>{
   const fy=y??curDate.getFullYear(),fm=m??curDate.getMonth();
   return getTxs().filter(t=>{const d=new Date(t.date+'T12:00');return d.getFullYear()===fy&&d.getMonth()===fm;});
 };
+
+// ═══ SEGURANÇA DOS DADOS (backup / restauração / snapshots) ═══
+// Regras: nunca renomear/apagar chaves fp_<id>_*; restauração só grava no usuário logado;
+// toda migração ou restauração guarda antes um snapshot (fpbak_<id>_<ts>).
+const SCHEMA_VERSION=1;
+const userPrefix=()=>`fp_${currentUser.id}_`;
+function collectUserData(){
+  const pre=userPrefix(),data={};
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith(pre))data[k.slice(pre.length)]=localStorage.getItem(k);}
+  return data;
+}
+function summarize(data){
+  const r={};
+  ['pf','pj'].forEach(m=>{let t=[];try{t=JSON.parse(data[m+'_txs']||'[]')}catch{}
+    r[m]={lanc:t.length,receitas:t.filter(x=>x.type==='income').reduce((a,x)=>a+(+x.value||0),0),despesas:t.filter(x=>x.type==='expense').reduce((a,x)=>a+(+x.value||0),0)};});
+  return r;
+}
+function fmtSummary(s){return ['pf','pj'].map(m=>`${m.toUpperCase()}: ${s[m].lanc} lançamentos • receitas ${fmt(s[m].receitas)} • despesas ${fmt(s[m].despesas)}`).join('\n');}
+function takeSnapshot(reason){
+  try{
+    const key=`fpbak_${currentUser.id}_${Date.now()}`;
+    localStorage.setItem(key,JSON.stringify({reason,at:new Date().toISOString(),data:collectUserData()}));
+    const mine=Object.keys(localStorage).filter(k=>k.startsWith(`fpbak_${currentUser.id}_`)).sort();
+    while(mine.length>3)localStorage.removeItem(mine.shift()); // só remove snapshots antigos, nunca dados
+    return true;
+  }catch(e){console.error(e);return false;}
+}
+function runMigrations(){
+  const cur=ldg('schema',0);
+  if(cur>=SCHEMA_VERSION)return;
+  if(!takeSnapshot(`antes da migração v${cur}→v${SCHEMA_VERSION}`)){toast('Sem espaço para cópia de segurança — atualização adiada','error');return;}
+  // migrações futuras entram aqui, sempre aditivas (só adicionam campos)
+  svg('schema',SCHEMA_VERSION);
+}
+async function exportBackup(){
+  const data=collectUserData();
+  const payload={app:'financaspro',version:SCHEMA_VERSION,userId:currentUser.id,userName:currentUser.name,exportedAt:new Date().toISOString(),summary:summarize(data),data};
+  const d=new Date(),stamp=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const name=`financaspro_backup_${currentUser.name.replace(/\W+/g,'_')}_${stamp}.json`;
+  const blob=new Blob([JSON.stringify(payload,null,1)],{type:'application/json'});
+  svg('lastBackup',Date.now());updateBackupInfo();
+  try{const f=new File([blob],name,{type:'application/json'});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Backup FinançasPro'});toast('Backup gerado!','success');return;}
+  }catch(e){if(e.name==='AbortError')return;}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();toast('Backup baixado!','success');
+}
+function importBackup(input){
+  const file=input.files[0];input.value='';if(!file)return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    let b;try{b=JSON.parse(rd.result)}catch{toast('Arquivo inválido','error');return;}
+    if(b.app!=='financaspro'||!b.data||typeof b.data!=='object'){toast('Não é um backup do FinançasPro','error');return;}
+    if(b.userId!==currentUser.id&&!confirm(`⚠️ Este backup é de "${b.userName}", não do usuário logado (${currentUser.name}).\n\nSó continue se for realmente seu (ex.: celular novo). Os dados serão gravados APENAS em ${currentUser.name}. Continuar?`))return;
+    const now=summarize(collectUserData()),inc=summarize(b.data);
+    if(!confirm(`Restaurar backup de ${new Date(b.exportedAt).toLocaleString('pt-BR')}?\n\nDADOS ATUAIS:\n${fmtSummary(now)}\n\nDADOS DO BACKUP:\n${fmtSummary(inc)}\n\nOs dados atuais serão substituídos (uma cópia de segurança é guardada antes).`))return;
+    if(!takeSnapshot('antes de restaurar backup')){toast('Sem espaço para cópia de segurança — restauração cancelada','error');return;}
+    const pre=userPrefix();
+    Object.keys(collectUserData()).forEach(k=>localStorage.removeItem(pre+k));
+    Object.entries(b.data).forEach(([k,v])=>localStorage.setItem(pre+k,v));
+    const after=summarize(collectUserData());
+    const ok=['pf','pj'].every(m=>after[m].lanc===inc[m].lanc&&Math.abs(after[m].despesas-inc[m].despesas)<0.005&&Math.abs(after[m].receitas-inc[m].receitas)<0.005);
+    toast(ok?'Backup restaurado e conferido ✓':'Atenção: conferência divergiu',ok?'success':'error');
+    initApp();
+  };
+  rd.readAsText(file);
+}
+function updateBackupInfo(){
+  const el=document.getElementById('backupInfo');if(!el)return;
+  const last=ldg('lastBackup',0);
+  const days=last?Math.floor((Date.now()-last)/864e5):null;
+  el.textContent=last?`Último backup: ${days===0?'hoje':days+' dia(s) atrás'}`:'Nenhum backup ainda';
+  el.style.color=(!last||days>=7)?'var(--warning)':'var(--text3)';
+}
+function safetyInit(){
+  try{navigator.storage?.persist?.();}catch{}
+  runMigrations();updateBackupInfo();
+  const last=ldg('lastBackup',0);
+  if(!last||Date.now()-last>7*864e5)setTimeout(()=>toast('Faça um backup 💾 (menu lateral)','error'),1200);
+}
 
 // ═══ NAV ═══
 const PAGE_TITLES={dashboard:'Dashboard',lancamentos:'Lançamentos',recorrentes:'Recorrentes',parcelamentos:'Parcelamentos',vencimentos:'Vencimentos',patrimonio:'Patrimônio',planejamento:'Planejamento',futuro:'Visão Futura',historico:'Histórico',metas:'Metas',relatorio:'Relatório',categorias:'Categorias',alertas:'Alertas',dicas:'Dicas'};
