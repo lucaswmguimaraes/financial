@@ -2,7 +2,9 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>FinançasPro</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,900;1,9..144,300&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -415,7 +417,7 @@ input:checked+.sw-sl:before{transform:translateX(17px);background:var(--purple)}
 
 /* ── SIDEBAR OVERLAY ── */
 .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:90}
-@media(max-width:768px){
+@media all{
   .sidebar{transform:translateX(-100%)}
   .sidebar.open{transform:translateX(0)}
   .sb-overlay{display:block;opacity:0;pointer-events:none;transition:opacity 0.3s}
@@ -428,7 +430,29 @@ input:checked+.sw-sl:before{transform:translateX(17px);background:var(--purple)}
   .cards-row{grid-template-columns:1fr 1fr}
   .form-2col{grid-template-columns:1fr}
 }
-@media(max-width:480px){.cards-row{grid-template-columns:1fr}}
+@media all{.cards-row{grid-template-columns:1fr}}
+/* ── LARGURA FIXA DE CELULAR ── */
+html,body{overflow-x:clip;max-width:100%}
+input,select,textarea{font-size:16px!important} /* <16px faz o iPhone dar zoom ao focar */
+.main,.content,.page{min-width:0;max-width:100%}
+.hist-card{max-width:100%}.hist-table{min-width:460px}
+.hist-card{overflow-x:auto}
+.tbl-cards thead{display:none}
+.tbl-cards,.tbl-cards tbody{display:block;width:100%}
+.tbl-cards tr{display:grid;grid-template-columns:1fr auto;gap:3px 10px;padding:11px 4px;border-bottom:1px solid var(--border);align-items:center}
+.tbl-cards td{display:block;padding:0!important;border:0!important;min-width:0}
+.tbl-cards td:nth-child(1){grid-column:1;grid-row:3;font-size:0.74rem;color:var(--text3)}
+.tbl-cards td:nth-child(2){grid-column:1;grid-row:1;font-weight:500;overflow-wrap:anywhere}
+.tbl-cards td:nth-child(3){grid-column:1;grid-row:2;font-size:0.78rem;color:var(--text2)}
+.tbl-cards td:nth-child(4){display:none}
+.tbl-cards td:nth-child(5){grid-column:2;grid-row:1;text-align:right;white-space:nowrap}
+.tbl-cards td:nth-child(6){grid-column:2;grid-row:2/4;justify-self:end}
+/* No computador: coluna com largura de iPhone, centralizada */
+@media(min-width:500px){
+  html{background:#05070a}
+  body{max-width:430px;margin:0 auto;height:100dvh;overflow-y:auto;transform:translateZ(0);box-shadow:0 0 0 1px var(--border)}
+  .toast{right:12px;left:12px;max-width:none}
+}
 </style>
 </head>
 <body>
@@ -557,7 +581,7 @@ input:checked+.sw-sl:before{transform:translateX(17px);background:var(--purple)}
           <select class="sel-sm" id="fCat" onchange="renderLanc()"><option value="">Todas as categorias</option></select>
           <select class="sel-sm" id="fRec" onchange="renderLanc()"><option value="">Todos</option><option value="yes">Recorrentes</option><option value="inst">Parcelados</option><option value="no">Avulsos</option></select>
         </div>
-        <table><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Tipo</th><th>Valor</th><th></th></tr></thead>
+        <table class="tbl-cards"><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Tipo</th><th>Valor</th><th></th></tr></thead>
         <tbody id="lancBody"></tbody></table>
       </div>
     </div>
@@ -1036,7 +1060,7 @@ function nav(page){
   document.getElementById('topbarSub').textContent=(mode==='pf'?'Pessoa Física':'PJ / MEI')+' • '+(PAGE_TITLES[page]||page);
   const R={dashboard:renderDash,lancamentos:renderLanc,recorrentes:renderRec,parcelamentos:renderInst,vencimentos:renderVenc,patrimonio:renderPatrimonio,planejamento:renderPlan,futuro:renderFuturo,historico:renderHist,metas:renderMetas,relatorio:renderRelatorio,categorias:renderCats,alertas:renderAlertas,dicas:renderDicas};
   R[page]?.();
-  if(window.innerWidth<=768)closeSidebar();
+  closeSidebar();
 }
 function setMode(m){
   mode=m;
