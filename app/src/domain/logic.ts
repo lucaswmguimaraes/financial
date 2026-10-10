@@ -59,12 +59,22 @@ export function instMeta(i: Installment) {
   return { startYM, firstNum, paid, left: Math.max(0, i.total - paid), autoFromYM: i.autoFromYM || ymAdd(startYM, 1) }
 }
 export const instNumFor = (i: Installment, k: string) => { const m = instMeta(i); return m.firstNum + ymDiff(m.startYM, k) }
+// Uso real: a parcela seguinte costumava ser lançada como um parcelamento NOVO (ex.: "Viagem" 1/10 e
+// outro registro "Viagem" 2/10). A mesma compra é identificada por descrição + total de parcelas.
+const chainKey = (desc: string, total: number) => desc.trim().toLowerCase() + '|' + total
 export function pendingInsts(k: string) {
-  const txs = R.getTxs()
+  const txs = R.getTxs(), seen = new Set<string>()
+  const launched = new Set(txs.filter(t => t.installmentId && t.instCurr && t.instTotal).map(t => chainKey(t.desc, t.instTotal!) + '|' + t.instCurr))
   return R.getInstallments().flatMap(i => {
     const m = instMeta(i), n = instNumFor(i, k)
     if (k < m.autoFromYM || n <= m.firstNum || n > i.total) return []
     if (txs.some(t => t.installmentId === i.id && t.instCurr === n)) return []
+    const ck = chainKey(i.desc, i.total) + '|' + n
+    if (launched.has(ck) || seen.has(ck)) return [] // mesma compra já lançada (ou já sugerida) por outro registro
+    // o registro mais recente da mesma compra é quem continua a sequência
+    const newer = R.getInstallments().some(o => o.id !== i.id && chainKey(o.desc, o.total) === chainKey(i.desc, i.total) && Math.abs(o.value - i.value) < 0.05 && instMeta(o).firstNum > m.firstNum)
+    if (newer) return []
+    seen.add(ck)
     const lookalike = txs.some(t => ymOf(t.date) === k && t.type === 'expense' && !t.installmentId && Math.abs(t.value - i.value) < 0.01 && t.desc.toLowerCase().includes(i.desc.toLowerCase().slice(0, 6)))
     return [{ inst: i, n, lookalike }]
   })

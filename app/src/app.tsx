@@ -54,12 +54,13 @@ export function App() {
   const [batch, setBatch] = useState(false)
   useEffect(() => { const f = () => { setRoute(routeFromHash()); window.scrollTo(0, 0) }; addEventListener('hashchange', f); return () => removeEventListener('hashchange', f) }, [])
 
-  const login = (u: User) => {
+  const login = (u: User, isNew?: boolean) => {
     setUser(u.id); setMode('pf'); setU(u); setYm(todayYM())
     try { navigator.storage?.persist?.() } catch { /* opcional */ }
     const err = runMigrations(); if (err) toast(err, 'bad')
     const d = lastBackupDays(); if (d === null || d >= 7) setTimeout(() => toast('Faça um backup 💾 (Mais → Backup & Conta)', 'bad'), 1200)
-    location.hash = '#/inicio'
+    location.hash = isNew ? '#/guia' : '#/inicio'
+    if (isNew) setTimeout(() => toast('Bem-vindo! Comece pelo checklist do Guia 👇'), 400)
   }
   const logout = () => { setUser(null); setU(null) }
   if (!user || !session.userId) return <><Toaster /><Login users={getUsers()} onLogin={login} /></>

@@ -74,6 +74,18 @@ describe('parcelas', () => {
   })
 })
 
+describe('parcelas encadeadas (padrão real dos dados)', () => {
+  it('compra lançada como 1/10 e depois como novo parcelamento 2/10 gera UMA parcela por mês', () => {
+    R.saveInstallments([
+      { id: 'a', desc: 'Viagem', value: 445.53, cat: 'c5', total: 10, remaining: 9, day: 1, createdAt: 0, startYM: ymAdd(todayYM(), -3), firstNum: 1, autoFromYM: todayYM(), legacy: true },
+      { id: 'b', desc: 'Viagem', value: 445.53, cat: 'c5', total: 10, remaining: 8, day: 31, createdAt: 0, startYM: ymAdd(todayYM(), -2), firstNum: 2, autoFromYM: todayYM(), legacy: true },
+    ])
+    R.saveTxs([...R.getTxs(), { id: 'v1', desc: 'Viagem', value: 445.53, date: mdate(-3, 1), cat: 'c5', type: 'expense', installmentId: 'a', instCurr: 1, instTotal: 10, createdAt: 1 }, { id: 'v2', desc: 'Viagem', value: 445.53, date: mdate(-2, 28), cat: 'c5', type: 'expense', installmentId: 'b', instCurr: 2, instTotal: 10, createdAt: 2 }])
+    const p = L.pendingInsts(todayYM()).filter(x => x.inst.desc === 'Viagem')
+    expect(p.map(x => [x.inst.id, x.n])).toEqual([['b', 4]])
+  })
+})
+
 describe('contas e cartões (cenários do documento)', () => {
   beforeEach(() => {
     R.saveAccts([{ id: 'A', bank: 'Inter', initialBalance: 1000, initialDate: mdate(0, 1), type: 'corrente' }, { id: 'B', bank: 'Santander', initialBalance: 2000, initialDate: mdate(0, 1), type: 'corrente' }])
