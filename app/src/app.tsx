@@ -1,6 +1,9 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { Home, List, Plus, Landmark, LayoutGrid, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react'
-import { session, setMode, setUser, useStoreVersion, getUsers, ldg, type Mode, type User } from './lib/storage'
+import { session, setMode, setUser, useStoreVersion, ldg, type Mode, type User } from './lib/storage'
+import { supabase, startSync, stopSync, pull, syncInfo } from './lib/cloud'
+import { ImportSheet, localAccounts } from './screens/ImportSheet'
+import { Cloud, CloudOff, RefreshCw } from 'lucide-react'
 import { todayYM, ymAdd, ymLabel } from './lib/format'
 import { runMigrations, lastBackupDays } from './domain/safety'
 import { cx, toast, Toaster } from './ui/kit'
@@ -54,16 +57,29 @@ export function App() {
   const [batch, setBatch] = useState(false)
   useEffect(() => { const f = () => { setRoute(routeFromHash()); window.scrollTo(0, 0) }; addEventListener('hashchange', f); return () => removeEventListener('hashchange', f) }, [])
 
-  const login = (u: User, isNew?: boolean) => {
-    setUser(u.id); setMode('pf'); setU(u); setYm(todayYM())
-    try { navigator.storage?.persist?.() } catch { /* opcional */ }
-    const err = runMigrations(); if (err) toast(err, 'bad')
-    const d = lastBackupDays(); if (d === null || d >= 7) setTimeout(() => toast('Faça um backup 💾 (Mais → Backup & Conta)', 'bad'), 1200)
-    location.hash = isNew ? '#/guia' : '#/inicio'
-    if (isNew) setTimeout(() => toast('Bem-vindo! Comece pelo checklist do Guia 👇'), 400)
-  }
-  const logout = () => { setUser(null); setU(null) }
-  if (!user || !session.userId) return <><Toaster /><Login users={getUsers()} onLogin={login} /></>
+  const [ready, setReady] = useState(false), [recovery, setRecovery] = useState(false), [imp, setImp] = useState(false)
+  // Sessão do Supabase: entra, baixa da nuvem, migra (aditivo) e oferece importar dados antigos do aparelho.
+  useEffect(() => {
+    const enter = async (au: { id: string; email?: string; user_metadata?: Record<string, string> } | null) => {
+      if (!au) { stopSync(); setUser(null); setU(null); setReady(true); return }
+      if (session.userId === au.id) { setReady(true); return }
+      const md = au.user_metadata || {}
+      setUser(au.id); setMode('pf'); setYm(todayYM())
+      setU({ id: au.id, name: md.name || (au.email || '').split('@')[0], email: au.email || '', avatar: md.avatar || '😀', pass: '', createdAt: 0 })
+      try { navigator.storage?.persist?.() } catch { /* opcional */ }
+      startSync(); await pull()
+      const err = runMigrations(); if (err) toast(err, 'bad')
+      setReady(true)
+      if (localAccounts().length && !ldg<string>('importOffered', '')) setImp(true)
+    }
+    supabase.auth.getSession().then(({ data }) => enter(data.session?.user ?? null))
+    const { data: sub } = supabase.auth.onAuthStateChange((ev, s) => { if (ev === 'PASSWORD_RECOVERY') setRecovery(true); else if (ev === 'SIGNED_IN' || ev === 'SIGNED_OUT') enter(s?.user ?? null) })
+    return () => sub.subscription.unsubscribe()
+  }, [])
+  const logout = async () => { await supabase.auth.signOut(); stopSync(); setUser(null); setU(null); location.hash = '' }
+  if (!ready) return <div className="grid min-h-dvh place-items-center text-sm text-tx3">Carregando…</div>
+  if (recovery) return <><Toaster /><Login recovery onRecovered={() => { setRecovery(false); toast('Senha atualizada ✓') }} /></>
+  if (!user || !session.userId) return <><Toaster /><Login /></>
 
   const ctx: Ctx = { user, ym, setYm, route, go: r => { location.hash = '#/' + r }, openTx: id => setTx({ open: true, id }), openBatch: () => setBatch(true), logout }
   const R = ROUTES[route], isTab = !!R.tab
@@ -72,6 +88,7 @@ export function App() {
     <Header title={R.title} back={!isTab} />
     <main key={route + session.mode} className="anim-pop px-4 pb-28 pt-3">{R.el()}</main>
     <TabBar />
+    <ImportSheet open={imp} onClose={() => { setImp(false); localStorage.setItem(`fp_${session.userId}_importOffered`, JSON.stringify(new Date().toISOString())) }} />
     <TxSheet open={tx.open} id={tx.id} onClose={() => setTx({ open: false })} />
     <BatchSheet open={batch} onClose={() => setBatch(false)} />
   </AppCtx.Provider>
@@ -85,7 +102,7 @@ function Header({ title, back }: { title: string; back: boolean }) {
       {back ? <button onClick={() => history.back()} className="grid size-9 place-items-center rounded-xl bg-s2 text-tx2"><ArrowLeft size={18} /></button>
         : <div className="grid size-9 place-items-center rounded-xl bg-s2 text-lg">{user.avatar}</div>}
       <div className="min-w-0 flex-1"><h1 className="truncate font-display text-[22px] font-semibold leading-tight">{title}</h1>
-        <div className="text-[11px] text-tx3">{user.name}{bk !== null && bk >= 7 ? <span className="text-warn"> • backup há {bk} dias</span> : null}</div></div>
+        <div className="text-[11px] text-tx3"><SyncBadge /> {user.name}{bk !== null && bk >= 7 ? <span className="text-warn"> • backup há {bk} dias</span> : null}</div></div>
       <div className="flex rounded-xl border border-line bg-s2 p-0.5 text-xs font-bold">
         {(['pf', 'pj'] as Mode[]).map(x => <button key={x} onClick={() => setMode(x)} className={cx('rounded-lg px-2.5 py-1.5 transition', m === x ? (x === 'pf' ? 'bg-ok text-bg' : 'bg-pj text-bg') : 'text-tx3')}>{x.toUpperCase()}</button>)}
       </div>
@@ -114,3 +131,9 @@ function TabBar() {
   </nav>
 }
 export { ldg }
+
+function SyncBadge() {
+  const { state, lastError } = syncInfo()
+  const I = state === 'ok' ? Cloud : state === 'pending' ? RefreshCw : CloudOff
+  return <span title={lastError} className={cx('inline-flex items-center gap-0.5 align-[-2px]', state === 'ok' ? 'text-ok' : state === 'pending' ? 'text-info' : 'text-warn')}><I size={11} className={state === 'pending' ? 'animate-spin' : ''} />{state === 'offline' ? ' offline ·' : state === 'error' ? ' erro ·' : ''}</span>
+}

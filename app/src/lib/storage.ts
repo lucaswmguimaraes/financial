@@ -36,7 +36,13 @@ export const GK = (k: string) => `fp_${need()}_${k}`
 function read<T>(key: string, d: T): T {
   try { const v = localStorage.getItem(key); return v ? JSON.parse(v) as T : d } catch { return d }
 }
-function write(key: string, v: unknown) { localStorage.setItem(key, JSON.stringify(v)); emit() }
+// Gancho de sincronização: chamado a cada gravação de dado do usuário (fp_<id>_<chave>)
+let writeHook: ((suffix: string) => void) | null = null
+export function setWriteHook(fn: typeof writeHook) { writeHook = fn }
+function write(key: string, v: unknown) {
+  localStorage.setItem(key, JSON.stringify(v)); emit()
+  if (userId && key.startsWith(`fp_${userId}_`)) writeHook?.(key.slice(`fp_${userId}_`.length))
+}
 
 export const ld = <T,>(k: string, d: T, m: Mode = mode) => read<T>(UK(k, m), d)
 export const sv = (k: string, v: unknown, m: Mode = mode) => write(UK(k, m), v)
