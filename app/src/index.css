@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #08090d;
+  --color-s1: #0f1117;
+  --color-s2: #161922;
+  --color-s3: #1f2433;
+  --color-line: rgba(255, 255, 255, 0.07);
+  --color-line2: rgba(255, 255, 255, 0.12);
+  --color-tx: #e9ebf3;
+  --color-tx2: #9aa0b4;
+  --color-tx3: #5d6278;
+  --color-ok: #5eead4;
+  --color-bad: #f87171;
+  --color-warn: #fb923c;
+  --color-info: #60a5fa;
+  --color-pur: #a78bfa;
+  --color-pj: #fbbf24;
+  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-display: "Fraunces", Georgia, serif;
+}
+
+html, body { background: var(--color-bg); color: var(--color-tx); overflow-x: clip; }
+body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
+/* <16px faz o iPhone dar zoom ao focar no campo */
+input, select, textarea { font-size: 16px !important; }
+input[type="date"] { min-height: 44px; }
+.num { font-variant-numeric: tabular-nums; }
+.pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 10px); }
+.pt-safe { padding-top: env(safe-area-inset-top); }
+@keyframes sheet-in { from { transform: translateY(100%) } to { transform: translateY(0) } }
+@keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
+@keyframes pop { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
+.anim-sheet { animation: sheet-in .28s cubic-bezier(.2,.8,.2,1) }
+.anim-fade { animation: fade-in .2s ease }
+.anim-pop { animation: pop .25s ease both }
+.no-scrollbar::-webkit-scrollbar { display: none }
+/* No computador: coluna com largura de iPhone */
+@media (min-width: 500px) {
+  html { background: #030406 }
+  #root { max-width: 430px; margin: 0 auto; min-height: 100dvh; background: var(--color-bg); box-shadow: 0 0 0 1px var(--color-line); position: relative; }
+}
