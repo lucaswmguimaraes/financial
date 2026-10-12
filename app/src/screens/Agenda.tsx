@@ -65,7 +65,7 @@ export function Futuro() {
       insts.forEach(i => { const n = L.instNumFor(i, k); if (n > L.instMeta(i).firstNum && n <= i.total) items.push({ desc: `${i.desc} (${n}/${i.total})`, value: i.value, type: 'expense', day: i.day || 1, emoji: cats.find(c => c.id === i.cat)?.emoji || '💳' }) })
       const inc = sum(items.filter(x => x.type === 'income'), x => x.value), exp = sum(items.filter(x => x.type === 'expense'), x => x.value)
       items.sort((a, b) => a.day - b.day)
-      return <Card key={k}><div className="mb-2 flex items-center justify-between"><b className="capitalize">{ymLabel(k)}</b><span className={cx('num font-semibold', inc - exp >= 0 ? 'text-ok' : 'text-bad')}>{fmt(inc - exp)}</span></div>
+      return <Card key={k}><div className="mb-2 flex items-center justify-between"><b>{ymLabel(k)}</b><span className={cx('num font-semibold', inc - exp >= 0 ? 'text-ok' : 'text-bad')}>{fmt(inc - exp)}</span></div>
         <div className="num mb-2 flex gap-3 text-[11px]"><span className="text-ok">+{fmt(inc)}</span><span className="text-bad">−{fmt(exp)}</span></div>
         {items.length ? items.map((it, i) => <div key={i} className="flex items-center gap-2 border-t border-line py-1.5 text-[13px]"><span className="w-8 text-[11px] text-tx3">dia {it.day}</span><span>{it.emoji}</span><span className="min-w-0 flex-1 truncate">{it.desc}</span><span className={cx('num', it.type === 'income' ? 'text-ok' : 'text-tx2')}>{fmt(it.value)}</span></div>) : <small className="text-tx3">Nada projetado</small>}
       </Card>

@@ -19,7 +19,7 @@ export function BatchSheet({ open, onClose }: { open: boolean; onClose: () => vo
       <span className="text-lg">{emoji}</span><span className="min-w-0 flex-1"><b className="block truncate text-sm">{title}</b><small className="text-tx3">{sub}</small>{warn && <small className="block text-warn">{warn}</small>}</span>
       <span className={cx('num text-sm font-semibold', type === 'income' ? 'text-ok' : 'text-bad')}>{type === 'income' ? '+' : '−'}{fmt(v)}</span></button>
   return <Sheet open={open} onClose={onClose} title="Início do mês" footer={<><Button className="flex-1" onClick={onClose}>Agora não</Button><Button className="flex-[2]" variant="primary" disabled={!keys.length} onClick={go}>Lançar {keys.length}</Button></>}>
-    <p className="mb-3 text-sm capitalize text-tx2">{ymLabel(ym)}</p>
+    <p className="mb-3 text-sm text-tx2">{ymLabel(ym)}</p>
     {!recs.length && !insts.length && <p className="py-6 text-center text-sm text-tx3">Nada pendente neste mês ✅</p>}
     {recs.length > 0 && <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-tx3">🔁 Recorrentes</div>}
     {recs.map(r => { const c = cats.find(x => x.id === r.cat); return <Item key={r.id} k={'r:' + r.id} emoji={c?.emoji || '📦'} title={r.desc} sub={`${L.FREQ_LBL[r.freq]}${r.day ? ' • dia ' + r.day : ''} • ${c?.name || '—'}`} v={r.value} type={r.type} /> })}

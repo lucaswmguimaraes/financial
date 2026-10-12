@@ -79,7 +79,7 @@ export function Guia() {
       {setup.map((s, i) => <Check key={i} done={s.done} label={`${i + 1}. ${s.label}`} sub={<>{s.sub} <span className="text-ok">abrir ›</span></>} onToggle={() => go(s.r)} />)}
       <h4>Esta semana</h4>
       {weekly.map(w => <Check key={w.id} done={w.auto ? !!w.done : ck(wk, w.id)} auto={w.auto} label={w.label} sub={w.sub} onToggle={() => toggle(wk, w.id)} />)}
-      <h4 className="capitalize">Este mês · {ymLabel(todayYM())}</h4>
+      <h4>Este mês · {ymLabel(todayYM())}</h4>
       {monthly.map(m => <Check key={m.id} done={m.auto ? !!m.done : ck(mk, m.id)} auto={m.auto} label={m.label} sub={m.sub} onToggle={() => toggle(mk, m.id)} />)}
       <p className="mt-3 text-[11px] text-tx3">Itens “auto” são verificados pelo próprio app. Os demais vocês marcam; a semana e o mês recomeçam sozinhos.</p>
     </Section>

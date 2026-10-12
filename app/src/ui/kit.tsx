@@ -66,9 +66,9 @@ export function Toaster() {
   return <div className="pointer-events-none fixed inset-x-0 top-[max(env(safe-area-inset-top),12px)] z-[60] flex justify-center px-4"><div key={t.id} className={cx('anim-pop max-w-[400px] rounded-2xl border bg-s2/95 px-4 py-3 text-sm shadow-2xl backdrop-blur', t.tone === 'bad' ? 'border-bad/40' : 'border-ok/40')}>{t.tone === 'bad' ? '⚠️ ' : '✓ '}{t.m}</div></div>
 }
 
-export const Stat = ({ label, value, sub, tone, onClick, icon }: { label: string; value: ReactNode; sub?: ReactNode; tone?: 'ok' | 'bad' | 'info' | 'pur' | 'warn'; onClick?: () => void; icon?: ReactNode }) =>
-  <Card onClick={onClick} className="relative overflow-hidden !p-3.5">
+export const Stat = ({ label, value, sub, tone, onClick, icon, compact }: { label: string; value: ReactNode; sub?: ReactNode; tone?: 'ok' | 'bad' | 'info' | 'pur' | 'warn'; onClick?: () => void; icon?: ReactNode; compact?: boolean }) =>
+  <Card onClick={onClick} className={cx('relative overflow-hidden', compact ? '!p-2.5' : '!p-3.5')}>
     <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-tx3">{icon}{label}</div>
-    <div className={cx('num mt-1 font-display text-[22px] font-semibold leading-tight', tone === 'ok' && 'text-ok', tone === 'bad' && 'text-bad', tone === 'info' && 'text-info', tone === 'pur' && 'text-pur', tone === 'warn' && 'text-warn')}>{value}</div>
+    <div className={cx('num mt-1 font-display font-semibold leading-tight whitespace-nowrap', compact ? 'text-[clamp(12px,3.4vw,16px)]' : 'text-[22px]', tone === 'ok' && 'text-ok', tone === 'bad' && 'text-bad', tone === 'info' && 'text-info', tone === 'pur' && 'text-pur', tone === 'warn' && 'text-warn')}>{value}</div>
     {sub && <div className="mt-0.5 text-[11px] leading-snug text-tx3">{sub}</div>}
   </Card>

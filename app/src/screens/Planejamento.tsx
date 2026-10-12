@@ -16,15 +16,15 @@ export function Planejamento() {
   const roll = (on: boolean) => { R.saveSettings({ ...st, rollover: on, rolloverFrom: st.rolloverFrom || ym }); toast(on ? 'Sobras passam a acumular' : 'Acúmulo desligado') }
   const copyPrev = () => { const pm = R.getPlanM(); pm[ym] = { ...L.planFor(ymAdd(ym, -1)) }; R.savePlanM(pm); toast('Copiado do mês anterior') }
   return <div>
-    <div className="grid grid-cols-3 gap-2"><Stat label="Orçado" value={fmt(totBud)} /><Stat label="Gasto" value={fmt(totSpent)} tone="bad" /><Stat label={diff >= 0 ? 'Livre' : 'Acima'} value={fmt(Math.abs(diff))} tone={diff >= 0 ? 'ok' : 'bad'} /></div>
-    <Card className="mt-3"><div className="flex items-center justify-between gap-3"><div className="text-sm"><b className="capitalize">{ymLabel(ym)}</b><div className="text-xs text-tx3">{own ? 'Orçamento próprio deste mês' : 'Herdado do mês anterior'}</div></div><Button size="sm" variant="primary" onClick={open}><Pencil size={13} /> Editar</Button></div>
+    <div className="grid grid-cols-3 gap-2"><Stat compact label="Orçado" value={fmt(totBud)} /><Stat compact label="Gasto" value={fmt(totSpent)} tone="bad" /><Stat compact label={diff >= 0 ? 'Livre' : 'Acima'} value={fmt(Math.abs(diff))} tone={diff >= 0 ? 'ok' : 'bad'} /></div>
+    <Card className="mt-3"><div className="flex items-center justify-between gap-3"><div className="text-sm"><b>{ymLabel(ym)}</b><div className="text-xs text-tx3">{own ? 'Orçamento próprio deste mês' : 'Herdado do mês anterior'}</div></div><Button size="sm" variant="primary" onClick={open}><Pencil size={13} /> Editar</Button></div>
       <div className="mt-2 border-t border-line pt-2"><Toggle checked={!!st.rollover} onChange={roll} label="Acumular sobras (o que sobra de um mês soma no próximo)" /></div></Card>
     <Title>Por categoria</Title>
     <div className="flex flex-col gap-2">{cats.map(c => {
       const bud = L.budgetOf(c, ym), carry = L.carryOf(c, ym), av = bud + carry, sp = L.spentOf(c.id, ym), over = av > 0 && sp > av, warn = av > 0 && sp / av >= .8
       if (!av && !sp) return null
-      return <Card key={c.id} className="!p-3.5"><div className="mb-2 flex items-center justify-between text-sm"><span>{c.emoji} {c.name}</span><span className="num"><b className={over ? 'text-bad' : ''}>{fmt(sp)}</b><span className="text-tx3"> / {fmt(av)}</span></span></div>
-        <Progress value={sp} max={av || 1} color={over ? 'var(--color-bad)' : warn ? 'var(--color-warn)' : 'var(--color-ok)'} />
+      return <Card key={c.id} className="!p-3.5"><div className="mb-2 flex items-center justify-between text-sm"><span>{c.emoji} {c.name}</span><span className="num"><b className={over ? 'text-bad' : ''}>{fmt(sp)}</b>{av > 0 && <span className="text-tx3"> / {fmt(av)}</span>}</span></div>
+        {av > 0 ? <Progress value={sp} max={av} color={over ? 'var(--color-bad)' : warn ? 'var(--color-warn)' : 'var(--color-ok)'} /> : <div className="text-[11px] text-warn">Sem orçamento definido — toque em Editar para planejar</div>}
         <div className="num mt-1.5 flex justify-between text-[11px] text-tx3"><span>{carry ? `${carry > 0 ? '+' : ''}${fmt(carry)} do mês anterior` : bud ? `orçamento ${fmt(bud)}` : 'sem orçamento'}</span><span className={over ? 'text-bad' : ''}>{av ? (over ? `passou ${fmt(sp - av)}` : `livre ${fmt(av - sp)}`) : ''}</span></div></Card>
     })}</div>
     {cats.every(c => !L.availOf(c, ym) && !L.spentOf(c.id, ym)) && <Note>Defina quanto planejam gastar por categoria em “Editar”.</Note>}
